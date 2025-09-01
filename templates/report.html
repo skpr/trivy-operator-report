@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      {{ template "base.css" . }}
+    </style>
+    <title>Report</title>
+  </head>
+  <body>
+    <div class="page">
+      {{ template "overview.html" . }}
+      {{ if gt (len .ClusterConfigAudits) 0 }}
+        <h1 id="clusterconfigaudit">Cluster Config Audit</h1>
+        {{- range .ClusterConfigAudits }}
+        {{ template "configaudit.html" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .ConfigAudits) 0 }}
+        <h1 id="configaudit">Config Audit</h1>
+        {{- range .ConfigAudits }}
+        {{ template "configaudit.html" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .ClusterVulnerabilities) 0 }}
+        <h1 id="clustervuln">Cluster Vulnerabilities</h1>
+        {{- range .ClusterVulnerabilities }}
+          {{ template "vulnerability.html" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .Vulnerabilities) 0 }}
+        <h1 id="vuln">Vulnerabilities</h1>
+        {{- range .Vulnerabilities }}
+          {{ template "vulnerability.html" . }}
+        {{- end }}
+      {{ end }}
+    </div>
+  </body>
+</html>

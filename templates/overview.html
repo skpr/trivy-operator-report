@@ -1,0 +1,32 @@
+<h1>Overview</h1>
+
+<ul>
+    {{ if gt (len .ClusterConfigAudits) 0 }}
+        <li><a href="#clusterconfigaudit">Cluster Config Audits</a><ul>
+            {{- range .ClusterConfigAudits }}
+            <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+            {{- end }}
+        </ul></li>
+    {{ end }}
+    {{ if gt (len .ConfigAudits) 0 }}
+        <li><a href="#configaudit">Config Audits</a><ul>
+            {{- range .ConfigAudits }}
+            <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+            {{- end }}
+        </ul></li>
+    {{ end }}
+    {{ if gt (len .ClusterVulnerabilities) 0 }}
+        <li><a href="#clustervuln">Cluster Vulnerabilities</a><ul>
+            {{- range .ClusterVulnerabilities }}
+            <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+            {{- end }}
+        </ul></li>
+    {{ end }}
+    {{ if gt (len .Vulnerabilities) 0 }}
+        <li><a href="#vuln">Vulnerabilities</a><ul>
+            {{- range .Vulnerabilities }}
+            <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+            {{- end }}
+        </ul></li>
+    {{ end }}
+</ul>
