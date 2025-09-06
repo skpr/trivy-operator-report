@@ -32,9 +32,6 @@ table {
     text-align: left;
     width: 90%;
 }
-.score {
-    float: right;
-}
 .summary td {
     width: 20%;
 }
