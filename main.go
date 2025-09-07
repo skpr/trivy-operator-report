@@ -39,17 +39,35 @@ func run() error {
 	}
 	document.AppendClusterConfigAuditReports(*clusterConfigAudits)
 
+	clusterReports, err := client.AquasecurityV1alpha1().ClusterVulnerabilityReports("").List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to list cluster vulnerability reports: %w", err)
+	}
+	document.AppendClusterVulnerabilityReports(*clusterReports)
+
 	configAudits, err := client.AquasecurityV1alpha1().ConfigAuditReports("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to list config audit reports: %w", err)
 	}
 	document.AppendConfigAuditReports(*configAudits)
 
-	clusterReports, err := client.AquasecurityV1alpha1().ClusterVulnerabilityReports("").List(context.TODO(), metav1.ListOptions{})
+	exposedSecrets, err := client.AquasecurityV1alpha1().ExposedSecretReports("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to list cluster vulnerability reports: %w", err)
+		return fmt.Errorf("failed to list exposed secret reports: %w", err)
 	}
-	document.AppendClusterVulnerabilityReports(*clusterReports)
+	document.AppendExposedSecretReports(*exposedSecrets)
+
+	infraAssessments, err := client.AquasecurityV1alpha1().InfraAssessmentReports("").List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to list infra assessment reports: %w", err)
+	}
+	document.AppendInfraAssessmentReports(*infraAssessments)
+
+	rbacAssesments, err := client.AquasecurityV1alpha1().RbacAssessmentReports("").List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to list rbac assessment reports: %w", err)
+	}
+	document.AppendRbacAssessmentReports(*rbacAssesments)
 
 	reports, err := client.AquasecurityV1alpha1().VulnerabilityReports("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {

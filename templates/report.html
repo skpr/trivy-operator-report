@@ -16,16 +16,34 @@
         {{ template "configaudit.html" . }}
         {{- end }}
       {{ end }}
+      {{ if gt (len .ClusterVulnerabilities) 0 }}
+        <h1 id="clustervuln">Cluster Vulnerabilities</h1>
+        {{- range .ClusterVulnerabilities }}
+        {{ template "vulnerability.html" . }}
+        {{- end }}
+      {{ end }}
       {{ if gt (len .ConfigAudits) 0 }}
         <h1 id="configaudit">Config Audit</h1>
         {{- range .ConfigAudits }}
         {{ template "configaudit.html" . }}
         {{- end }}
       {{ end }}
-      {{ if gt (len .ClusterVulnerabilities) 0 }}
-        <h1 id="clustervuln">Cluster Vulnerabilities</h1>
-        {{- range .ClusterVulnerabilities }}
-          {{ template "vulnerability.html" . }}
+      {{ if gt (len .ExposedSecrets) 0 }}
+        <h1 id="exposesecret">Exposed Secret</h1>
+        {{- range .ExposedSecrets }}
+        {{ template "exposedsecret.html" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .InfraAssessments) 0 }}
+        <h1 id="infraassessment">Infra Assessments</h1>
+        {{- range .InfraAssessments }}
+        {{ template "infraassessment.html" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .RbacAssessments) 0 }}
+        <h1 id="rbacassessment">Rbac Assessments</h1>
+        {{- range .RbacAssessments }}
+        {{ template "rbacassessment.html" . }}
         {{- end }}
       {{ end }}
       {{ if gt (len .Vulnerabilities) 0 }}
