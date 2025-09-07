@@ -2,6 +2,7 @@ package sorter
 
 import (
 	"github.com/aquasecurity/trivy-operator/pkg/apis/aquasecurity/v1alpha1"
+
 	"github.com/skpr/trivy-operator-report/internal/extensions"
 )
 
