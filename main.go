@@ -77,7 +77,7 @@ func run() error {
 
 	funcMap := template.FuncMap{
 		"severity": func(input v1alpha1.Severity) string {
-			return fmt.Sprintf("%s", input)
+			return string(input)
 		},
 	}
 
