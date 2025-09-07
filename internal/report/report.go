@@ -64,7 +64,7 @@ func (r *Report) AppendExposedSecretReports(reports v1alpha1.ExposedSecretReport
 		if len(exposedSecretReport.Report.Secrets) == 0 {
 			continue
 		}
-		//sort.Sort(sorter.CheckSorter(exposedSecretReport.Report.Checks))
+		sort.Sort(sorter.SecretSorter(exposedSecretReport.Report.Secrets))
 		r.ExposedSecrets = append(r.ExposedSecrets, &exposedSecretReport)
 	}
 }
