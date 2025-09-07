@@ -28,6 +28,13 @@
         <td colspan="2">
             <p><strong>{{ .Title }}</strong></p>
             <p>{{ .Description }}</p>
+            {{ if .Messages }}
+            <ul>
+                {{ range .Messages }}
+                <li>{{ . }}</li>
+                {{ end }}
+            </ul>
+            {{ end }}
             {{ if .Scope }}
                 <p>{{ .Scope.Type }} {{ .Scope.Value }}</p>
             {{ end }}

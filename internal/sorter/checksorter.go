@@ -2,6 +2,7 @@ package sorter
 
 import (
 	"github.com/aquasecurity/trivy-operator/pkg/apis/aquasecurity/v1alpha1"
+
 	"github.com/skpr/trivy-operator-report/internal/extensions"
 )
 
@@ -16,5 +17,8 @@ func (a CheckSorter) Swap(i, j int) {
 }
 
 func (a CheckSorter) Less(i, j int) bool {
+	if a[i].Severity == a[j].Severity {
+		return a[i].ID > a[j].ID
+	}
 	return extensions.SeverityToInt(a[i].Severity) > extensions.SeverityToInt(a[j].Severity)
 }
