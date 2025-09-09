@@ -4,6 +4,7 @@ go 1.24.6
 
 require (
 	github.com/aquasecurity/trivy-operator v0.28.0
+	github.com/spf13/pflag v1.0.7
 	k8s.io/apimachinery v0.34.0
 	k8s.io/client-go v0.34.0
 )
@@ -50,7 +51,6 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/samber/lo v1.51.0 // indirect
 	github.com/samber/oops v1.18.1 // indirect
-	github.com/spf13/pflag v1.0.7 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
