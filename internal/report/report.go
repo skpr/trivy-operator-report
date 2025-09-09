@@ -8,24 +8,28 @@ import (
 )
 
 type Report struct {
-	ClusterConfigAudits    []*v1alpha1.ClusterConfigAuditReport
-	ClusterVulnerabilities []*v1alpha1.ClusterVulnerabilityReport
-	ConfigAudits           []*v1alpha1.ConfigAuditReport
-	ExposedSecrets         []*v1alpha1.ExposedSecretReport
-	InfraAssessments       []*v1alpha1.InfraAssessmentReport
-	RbacAssessments        []*v1alpha1.RbacAssessmentReport
-	Vulnerabilities        []*v1alpha1.VulnerabilityReport
+	ClusterConfigAudits     []*v1alpha1.ClusterConfigAuditReport
+	ClusterInfraAssessments []*v1alpha1.ClusterInfraAssessmentReport
+	ClusterRbacAssessments  []*v1alpha1.ClusterRbacAssessmentReport
+	ClusterVulnerabilities  []*v1alpha1.ClusterVulnerabilityReport
+	ConfigAudits            []*v1alpha1.ConfigAuditReport
+	ExposedSecrets          []*v1alpha1.ExposedSecretReport
+	InfraAssessments        []*v1alpha1.InfraAssessmentReport
+	RbacAssessments         []*v1alpha1.RbacAssessmentReport
+	Vulnerabilities         []*v1alpha1.VulnerabilityReport
 }
 
 func NewReport() Report {
 	return Report{
-		ClusterConfigAudits:    []*v1alpha1.ClusterConfigAuditReport{},
-		ClusterVulnerabilities: []*v1alpha1.ClusterVulnerabilityReport{},
-		ConfigAudits:           []*v1alpha1.ConfigAuditReport{},
-		ExposedSecrets:         []*v1alpha1.ExposedSecretReport{},
-		InfraAssessments:       []*v1alpha1.InfraAssessmentReport{},
-		RbacAssessments:        []*v1alpha1.RbacAssessmentReport{},
-		Vulnerabilities:        []*v1alpha1.VulnerabilityReport{},
+		ClusterConfigAudits:     []*v1alpha1.ClusterConfigAuditReport{},
+		ClusterInfraAssessments: []*v1alpha1.ClusterInfraAssessmentReport{},
+		ClusterRbacAssessments:  []*v1alpha1.ClusterRbacAssessmentReport{},
+		ClusterVulnerabilities:  []*v1alpha1.ClusterVulnerabilityReport{},
+		ConfigAudits:            []*v1alpha1.ConfigAuditReport{},
+		ExposedSecrets:          []*v1alpha1.ExposedSecretReport{},
+		InfraAssessments:        []*v1alpha1.InfraAssessmentReport{},
+		RbacAssessments:         []*v1alpha1.RbacAssessmentReport{},
+		Vulnerabilities:         []*v1alpha1.VulnerabilityReport{},
 	}
 }
 
@@ -36,6 +40,26 @@ func (r *Report) AppendClusterConfigAuditReports(reports v1alpha1.ClusterConfigA
 		}
 		sort.Sort(sorter.CheckSorter(configAuditReport.Report.Checks))
 		r.ClusterConfigAudits = append(r.ClusterConfigAudits, &configAuditReport)
+	}
+}
+
+func (r *Report) AppendClusterInfraAssessmentReports(reports v1alpha1.ClusterInfraAssessmentReportList) {
+	for _, infraAssessmentReport := range reports.Items {
+		if len(infraAssessmentReport.Report.Checks) == 0 {
+			continue
+		}
+		sort.Sort(sorter.CheckSorter(infraAssessmentReport.Report.Checks))
+		r.ClusterInfraAssessments = append(r.ClusterInfraAssessments, &infraAssessmentReport)
+	}
+}
+
+func (r *Report) AppendClusterRbacAssessmentReports(reports v1alpha1.ClusterRbacAssessmentReportList) {
+	for _, rbacAssessmentReport := range reports.Items {
+		if len(rbacAssessmentReport.Report.Checks) == 0 {
+			continue
+		}
+		sort.Sort(sorter.CheckSorter(rbacAssessmentReport.Report.Checks))
+		r.ClusterRbacAssessments = append(r.ClusterRbacAssessments, &rbacAssessmentReport)
 	}
 }
 
