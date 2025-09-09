@@ -16,6 +16,18 @@
         {{ template "configaudit.html" . }}
         {{- end }}
       {{ end }}
+      {{ if gt (len .ClusterInfraAssessments) 0 }}
+        <h1 id="clusterinfraassessment">Cluster Infra Assessments</h1>
+        {{- range .ClusterInfraAssessments }}
+        {{ template "infraassessment.html" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .ClusterRbacAssessments) 0 }}
+        <h1 id="clusterrbacassessment">Cluster Rbac Assessments</h1>
+        {{- range .ClusterRbacAssessments }}
+        {{ template "rbacassessment.html" . }}
+        {{- end }}
+      {{ end }}
       {{ if gt (len .ClusterVulnerabilities) 0 }}
         <h1 id="clustervuln">Cluster Vulnerabilities</h1>
         {{- range .ClusterVulnerabilities }}

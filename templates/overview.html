@@ -8,6 +8,20 @@
         {{- end }}
     </ul></li>
     {{ end }}
+    {{ if gt (len .ClusterInfraAssessments) 0 }}
+    <li><a href="#clusterinfraassessment">Cluster Infra Assessments</a><ul>
+        {{- range .ClusterInfraAssessments }}
+        <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+        {{- end }}
+    </ul></li>
+    {{ end }}
+    {{ if gt (len .ClusterRbacAssessments) 0 }}
+    <li><a href="#clusterrbacassessment">Cluster Rbac Assessments</a><ul>
+        {{- range .ClusterRbacAssessments }}
+        <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+        {{- end }}
+    </ul></li>
+    {{ end }}
     {{ if gt (len .ClusterVulnerabilities) 0 }}
     <li><a href="#clustervuln">Cluster Vulnerabilities</a><ul>
         {{- range .ClusterVulnerabilities }}

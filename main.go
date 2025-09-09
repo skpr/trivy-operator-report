@@ -39,6 +39,18 @@ func run() error {
 	}
 	document.AppendClusterConfigAuditReports(*clusterConfigAudits)
 
+	clusterInfraAssessments, err := client.AquasecurityV1alpha1().ClusterInfraAssessmentReports("").List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to list cluster infra assessment reports: %w", err)
+	}
+	document.AppendClusterInfraAssessmentReports(*clusterInfraAssessments)
+
+	clusterRbacAssesments, err := client.AquasecurityV1alpha1().ClusterRbacAssessmentReports("").List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to list cluster rbac assessment reports: %w", err)
+	}
+	document.AppendClusterRbacAssessmentReports(*clusterRbacAssesments)
+
 	clusterReports, err := client.AquasecurityV1alpha1().ClusterVulnerabilityReports("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to list cluster vulnerability reports: %w", err)
