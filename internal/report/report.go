@@ -33,6 +33,37 @@ func NewReport() Report {
 	}
 }
 
+func (r *Report) IsEmpty() bool {
+	if len(r.ClusterConfigAudits) != 0 {
+		return false
+	}
+	if len(r.ClusterInfraAssessments) != 0 {
+		return false
+	}
+	if len(r.ClusterRbacAssessments) != 0 {
+		return false
+	}
+	if len(r.ClusterVulnerabilities) != 0 {
+		return false
+	}
+	if len(r.ConfigAudits) != 0 {
+		return false
+	}
+	if len(r.ExposedSecrets) != 0 {
+		return false
+	}
+	if len(r.InfraAssessments) != 0 {
+		return false
+	}
+	if len(r.RbacAssessments) != 0 {
+		return false
+	}
+	if len(r.Vulnerabilities) != 0 {
+		return false
+	}
+	return true
+}
+
 func (r *Report) AppendClusterConfigAuditReports(reports v1alpha1.ClusterConfigAuditReportList) {
 	for _, configAuditReport := range reports.Items {
 		if len(configAuditReport.Report.Checks) == 0 {

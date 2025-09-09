@@ -101,6 +101,11 @@ func run() error {
 	}
 	document.AppendVulnerabilityReports(*reports)
 
+	if document.IsEmpty() {
+		fmt.Println("No vulnerability reports found.")
+		return nil
+	}
+
 	funcMap := template.FuncMap{
 		"severity": func(input v1alpha1.Severity) string {
 			return string(input)
@@ -131,6 +136,8 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("failed to execute template: %w", err)
 	}
+
+	fmt.Printf("Successfully generated the report to file %s\n", *outputFile)
 
 	return nil
 }
