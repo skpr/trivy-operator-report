@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"html/template"
 	"os"
@@ -14,6 +15,9 @@ import (
 
 	"github.com/skpr/trivy-operator-report/internal/report"
 )
+
+//go:embed templates/*
+var templateFS embed.FS
 
 func main() {
 	if err := run(); err != nil {
@@ -116,7 +120,7 @@ func run() error {
 
 	globs := []string{"*.css", "*.html"}
 	for _, glob := range globs {
-		tmpl, err = tmpl.ParseGlob("templates/" + glob)
+		tmpl, err = tmpl.ParseFS(templateFS, "templates/"+glob)
 		if err != nil {
 			return fmt.Errorf("failed to parse %s template: %w", glob, err)
 		}
