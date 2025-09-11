@@ -7,19 +7,47 @@ before:
 
 builds:
   - id: trivy-operator-report
-    mod_timestamp: '{{ .CommitTimestamp }}'
-    flags:
-      - -trimpath
     ldflags:
-      - '-extldflags -s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
+      - '-extldflags -static'
     goos: [ linux, darwin ]
     goarch: [ amd64, arm64 ]
-    binary: '{{ .ProjectName }}_{{ .Version }}'
+    env:
+      - CGO_ENABLED=0
 
 archives:
 - formats:
     - zip
   name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+
+dockers:
+  - dockerfile: Dockerfile
+    image_templates:
+      - "ghcr.io/skpr/trivy-operator-report:v{{ .Version }}-amd64"
+      - "ghcr.io/skpr/trivy-operator-report:latest-amd64"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+    use: buildx
+    goarch: amd64
+  - dockerfile: Dockerfile
+    image_templates:
+      - "ghcr.io/skpr/trivy-operator-report:v{{ .Version }}-arm64"
+      - "ghcr.io/skpr/trivy-operator-report:latest-arm64"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
+    use: buildx
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/skpr/trivy-operator-report:v{{ .Version }}"
+    image_templates:
+      - "ghcr.io/skpr/trivy-operator-report:v{{ .Version }}-amd64"
+      - "ghcr.io/skpr/trivy-operator-report:v{{ .Version }}-arm64"
+  - name_template: "ghcr.io/skpr/trivy-operator-report:latest"
+    image_templates:
+      - "ghcr.io/skpr/trivy-operator-report:latest-amd64"
+      - "ghcr.io/skpr/trivy-operator-report:latest-arm64"
 
 changelog:
   use: github-native
