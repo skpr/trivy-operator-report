@@ -6,7 +6,6 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
-	"log"
 	"os"
 	"time"
 
@@ -111,7 +110,7 @@ func run() error {
 	document.AppendVulnerabilityReports(*reports)
 
 	if document.IsEmpty() {
-		log.Println("No vulnerability reports found.")
+		fmt.Println("No vulnerability reports found.")
 		return nil
 	}
 
