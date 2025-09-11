@@ -1,14 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"embed"
 	"fmt"
 	"html/template"
+	"log"
 	"os"
+	"time"
 
 	"github.com/aquasecurity/trivy-operator/pkg/apis/aquasecurity/v1alpha1"
 	"github.com/aquasecurity/trivy-operator/pkg/clientset"
+	"github.com/slack-go/slack"
 	"github.com/spf13/pflag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
@@ -40,6 +44,7 @@ func run() error {
 	clusterReports := pflag.BoolP("cluster-reports", "c", false, "Whether to include global cluster reports.")
 	allNamespaces := pflag.BoolP("all-reports", "A", false, "Whether to get all reports from a cluster.")
 	outputFile := pflag.StringP("output-file", "o", "", "File to write results to.")
+	slackNotification := pflag.Bool("slack-notification", false, "Write the report to a slack channel.")
 	pflag.Parse()
 
 	if allNamespaces != nil && *allNamespaces {
@@ -106,7 +111,7 @@ func run() error {
 	document.AppendVulnerabilityReports(*reports)
 
 	if document.IsEmpty() {
-		fmt.Println("No vulnerability reports found.")
+		log.Println("No vulnerability reports found.")
 		return nil
 	}
 
@@ -126,22 +131,45 @@ func run() error {
 		}
 	}
 
-	f, err := os.OpenFile(*outputFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to open output file: %w", err)
-	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			fmt.Printf("Error closing file: %v\n", err)
-		}
-	}()
-
-	err = tmpl.ExecuteTemplate(f, "report.html", document)
+	var buf bytes.Buffer
+	err = tmpl.ExecuteTemplate(&buf, "report.html", document)
 	if err != nil {
 		return fmt.Errorf("failed to execute template: %w", err)
 	}
 
-	fmt.Printf("Successfully generated the report to file %s\n", *outputFile)
+	if outputFile != nil && *outputFile != "" {
+		err := os.WriteFile(*outputFile, buf.Bytes(), 0644)
+		if err != nil {
+			return fmt.Errorf("failed to write output file: %w", err)
+		}
+		fmt.Printf("successfully generated the report to file: %s\n", *outputFile)
+	}
+
+	if *slackNotification {
+		slackBotToken := os.Getenv("SLACK_BOT_TOKEN")
+		channelID := os.Getenv("SLACK_CHANNEL_ID")
+		cluster := os.Getenv("CLUSTER_NAME")
+		ctx := context.Background()
+
+		filename := fmt.Sprintf("%s_trivy_report_%s.html", cluster, time.Now().Format(time.RFC3339))
+
+		uploadParams := slack.UploadFileV2Parameters{
+			Channel:        channelID,
+			Title:          filename,
+			InitialComment: "New infrastructure security report for [stack]",
+			Content:        buf.String(),
+			Filename:       filename,
+			FileSize:       buf.Len(),
+		}
+
+		client := slack.New(slackBotToken)
+		_, err = client.UploadFileV2Context(ctx, uploadParams)
+		if err != nil {
+			return fmt.Errorf("error uploading file: %v", err)
+		}
+
+		fmt.Println("successfully posted report to Slack")
+	}
 
 	return nil
 }
