@@ -155,7 +155,7 @@ func run() error {
 		uploadParams := slack.UploadFileV2Parameters{
 			Channel:        channelID,
 			Title:          filename,
-			InitialComment: "New infrastructure security report for [stack]",
+			InitialComment: fmt.Sprintf("New infrastructure security report for %s", cluster),
 			Content:        buf.String(),
 			Filename:       filename,
 			FileSize:       buf.Len(),
