@@ -33,123 +33,90 @@ func NewReport() Report {
 	}
 }
 
+func (r *Report) NumberOfReports() int {
+	return len(r.ClusterConfigAudits) +
+		len(r.ClusterInfraAssessments) +
+		len(r.ClusterRbacAssessments) +
+		len(r.ClusterVulnerabilities) +
+		len(r.ConfigAudits) +
+		len(r.ExposedSecrets) +
+		len(r.InfraAssessments) +
+		len(r.RbacAssessments) +
+		len(r.Vulnerabilities)
+}
+
 func (r *Report) IsEmpty() bool {
-	if len(r.ClusterConfigAudits) != 0 {
-		return false
-	}
-	if len(r.ClusterInfraAssessments) != 0 {
-		return false
-	}
-	if len(r.ClusterRbacAssessments) != 0 {
-		return false
-	}
-	if len(r.ClusterVulnerabilities) != 0 {
-		return false
-	}
-	if len(r.ConfigAudits) != 0 {
-		return false
-	}
-	if len(r.ExposedSecrets) != 0 {
-		return false
-	}
-	if len(r.InfraAssessments) != 0 {
-		return false
-	}
-	if len(r.RbacAssessments) != 0 {
-		return false
-	}
-	if len(r.Vulnerabilities) != 0 {
-		return false
-	}
-	return true
+	return r.NumberOfReports() == 0
 }
 
-func (r *Report) AppendClusterConfigAuditReports(reports v1alpha1.ClusterConfigAuditReportList) {
-	for _, configAuditReport := range reports.Items {
-		if len(configAuditReport.Report.Checks) == 0 {
-			continue
-		}
-		sort.Sort(sorter.CheckSorter(configAuditReport.Report.Checks))
-		r.ClusterConfigAudits = append(r.ClusterConfigAudits, &configAuditReport)
+func (r *Report) AddClusterConfigAuditReport(report v1alpha1.ClusterConfigAuditReport) {
+	if len(report.Report.Checks) == 0 {
+		return
 	}
+	sort.Sort(sorter.CheckSorter(report.Report.Checks))
+	r.ClusterConfigAudits = append(r.ClusterConfigAudits, &report)
 }
 
-func (r *Report) AppendClusterInfraAssessmentReports(reports v1alpha1.ClusterInfraAssessmentReportList) {
-	for _, infraAssessmentReport := range reports.Items {
-		if len(infraAssessmentReport.Report.Checks) == 0 {
-			continue
-		}
-		sort.Sort(sorter.CheckSorter(infraAssessmentReport.Report.Checks))
-		r.ClusterInfraAssessments = append(r.ClusterInfraAssessments, &infraAssessmentReport)
+func (r *Report) AddClusterInfraAssessmentReport(report v1alpha1.ClusterInfraAssessmentReport) {
+	if len(report.Report.Checks) == 0 {
+		return
 	}
+	sort.Sort(sorter.CheckSorter(report.Report.Checks))
+	r.ClusterInfraAssessments = append(r.ClusterInfraAssessments, &report)
 }
 
-func (r *Report) AppendClusterRbacAssessmentReports(reports v1alpha1.ClusterRbacAssessmentReportList) {
-	for _, rbacAssessmentReport := range reports.Items {
-		if len(rbacAssessmentReport.Report.Checks) == 0 {
-			continue
-		}
-		sort.Sort(sorter.CheckSorter(rbacAssessmentReport.Report.Checks))
-		r.ClusterRbacAssessments = append(r.ClusterRbacAssessments, &rbacAssessmentReport)
+func (r *Report) AddClusterRbacAssessmentReport(report v1alpha1.ClusterRbacAssessmentReport) {
+	if len(report.Report.Checks) == 0 {
+		return
 	}
+	sort.Sort(sorter.CheckSorter(report.Report.Checks))
+	r.ClusterRbacAssessments = append(r.ClusterRbacAssessments, &report)
 }
 
-func (r *Report) AppendClusterVulnerabilityReports(reports v1alpha1.ClusterVulnerabilityReportList) {
-	for _, vulnerabilityReport := range reports.Items {
-		if len(vulnerabilityReport.Report.Vulnerabilities) == 0 {
-			continue
-		}
-		sort.Sort(sorter.VulnerabilitySorter(vulnerabilityReport.Report.Vulnerabilities))
-		r.ClusterVulnerabilities = append(r.ClusterVulnerabilities, &vulnerabilityReport)
+func (r *Report) AddClusterVulnerabilityReport(report v1alpha1.ClusterVulnerabilityReport) {
+	if len(report.Report.Vulnerabilities) == 0 {
+		return
 	}
+	sort.Sort(sorter.VulnerabilitySorter(report.Report.Vulnerabilities))
+	r.ClusterVulnerabilities = append(r.ClusterVulnerabilities, &report)
 }
 
-func (r *Report) AppendConfigAuditReports(reports v1alpha1.ConfigAuditReportList) {
-	for _, configAuditReport := range reports.Items {
-		if len(configAuditReport.Report.Checks) == 0 {
-			continue
-		}
-		sort.Sort(sorter.CheckSorter(configAuditReport.Report.Checks))
-		r.ConfigAudits = append(r.ConfigAudits, &configAuditReport)
+func (r *Report) AddConfigAuditReport(report v1alpha1.ConfigAuditReport) {
+	if len(report.Report.Checks) == 0 {
+		return
 	}
+	sort.Sort(sorter.CheckSorter(report.Report.Checks))
+	r.ConfigAudits = append(r.ConfigAudits, &report)
 }
 
-func (r *Report) AppendExposedSecretReports(reports v1alpha1.ExposedSecretReportList) {
-	for _, exposedSecretReport := range reports.Items {
-		if len(exposedSecretReport.Report.Secrets) == 0 {
-			continue
-		}
-		sort.Sort(sorter.SecretSorter(exposedSecretReport.Report.Secrets))
-		r.ExposedSecrets = append(r.ExposedSecrets, &exposedSecretReport)
+func (r *Report) AddExposedSecretReport(report v1alpha1.ExposedSecretReport) {
+	if len(report.Report.Secrets) == 0 {
+		return
 	}
+	sort.Sort(sorter.SecretSorter(report.Report.Secrets))
+	r.ExposedSecrets = append(r.ExposedSecrets, &report)
 }
 
-func (r *Report) AppendInfraAssessmentReports(reports v1alpha1.InfraAssessmentReportList) {
-	for _, infraAssessmentReport := range reports.Items {
-		if len(infraAssessmentReport.Report.Checks) == 0 {
-			continue
-		}
-		sort.Sort(sorter.CheckSorter(infraAssessmentReport.Report.Checks))
-		r.InfraAssessments = append(r.InfraAssessments, &infraAssessmentReport)
+func (r *Report) AddInfraAssessmentReport(report v1alpha1.InfraAssessmentReport) {
+	if len(report.Report.Checks) == 0 {
+		return
 	}
+	sort.Sort(sorter.CheckSorter(report.Report.Checks))
+	r.InfraAssessments = append(r.InfraAssessments, &report)
 }
 
-func (r *Report) AppendRbacAssessmentReports(reports v1alpha1.RbacAssessmentReportList) {
-	for _, rbacAssessmentReport := range reports.Items {
-		if len(rbacAssessmentReport.Report.Checks) == 0 {
-			continue
-		}
-		sort.Sort(sorter.CheckSorter(rbacAssessmentReport.Report.Checks))
-		r.RbacAssessments = append(r.RbacAssessments, &rbacAssessmentReport)
+func (r *Report) AddRbacAssessmentReport(report v1alpha1.RbacAssessmentReport) {
+	if len(report.Report.Checks) == 0 {
+		return
 	}
+	sort.Sort(sorter.CheckSorter(report.Report.Checks))
+	r.RbacAssessments = append(r.RbacAssessments, &report)
 }
 
-func (r *Report) AppendVulnerabilityReports(reports v1alpha1.VulnerabilityReportList) {
-	for _, vulnerabilityReport := range reports.Items {
-		if len(vulnerabilityReport.Report.Vulnerabilities) == 0 {
-			continue
-		}
-		sort.Sort(sorter.VulnerabilitySorter(vulnerabilityReport.Report.Vulnerabilities))
-		r.Vulnerabilities = append(r.Vulnerabilities, &vulnerabilityReport)
+func (r *Report) AddVulnerabilityReport(report v1alpha1.VulnerabilityReport) {
+	if len(report.Report.Vulnerabilities) == 0 {
+		return
 	}
+	sort.Sort(sorter.VulnerabilitySorter(report.Report.Vulnerabilities))
+	r.Vulnerabilities = append(r.Vulnerabilities, &report)
 }

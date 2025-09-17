@@ -40,7 +40,6 @@ func run() error {
 	}
 
 	namespace := pflag.StringP("namespace", "n", "default", "Namespace of the cluster reports.")
-	clusterReports := pflag.BoolP("cluster-reports", "c", false, "Whether to include global cluster reports.")
 	allNamespaces := pflag.BoolP("all-reports", "A", false, "Whether to get all reports from a cluster.")
 	outputFile := pflag.StringP("output-file", "o", "", "File to write results to.")
 	slackNotification := pflag.Bool("slack-notification", false, "Write the report to a slack channel.")
@@ -48,76 +47,47 @@ func run() error {
 
 	if allNamespaces != nil && *allNamespaces {
 		*namespace = ""
-		*clusterReports = true
 	}
+
+	var name *string
+	args := pflag.Args()
+	if len(args) > 1 {
+		return fmt.Errorf("you can only pass one report name at a time")
+	}
+	if len(args) > 0 {
+		name = &args[0]
+	}
+
+	ctx := context.Background()
 
 	document := report.NewReport()
-
-	if clusterReports != nil && *clusterReports {
-		clusterConfigAudits, err := client.AquasecurityV1alpha1().ClusterConfigAuditReports("").List(context.TODO(), metav1.ListOptions{})
+	if name == nil {
+		opts := metav1.ListOptions{}
+		err = document.PopulateReports(client, *namespace, ctx, opts)
 		if err != nil {
-			return fmt.Errorf("failed to list cluster config audit reports: %w", err)
+			return err
 		}
-		document.AppendClusterConfigAuditReports(*clusterConfigAudits)
-
-		clusterInfraAssessments, err := client.AquasecurityV1alpha1().ClusterInfraAssessmentReports("").List(context.TODO(), metav1.ListOptions{})
+		if document.IsEmpty() {
+			fmt.Println("No vulnerability reports found.")
+			return nil
+		}
+	} else {
+		opts := metav1.GetOptions{}
+		err = document.PopulateReportByName(client, *name, *namespace, ctx, opts)
 		if err != nil {
-			return fmt.Errorf("failed to list cluster infra assessment reports: %w", err)
+			return err
 		}
-		document.AppendClusterInfraAssessmentReports(*clusterInfraAssessments)
-
-		clusterRbacAssesments, err := client.AquasecurityV1alpha1().ClusterRbacAssessmentReports("").List(context.TODO(), metav1.ListOptions{})
-		if err != nil {
-			return fmt.Errorf("failed to list cluster rbac assessment reports: %w", err)
+		if document.IsEmpty() {
+			fmt.Printf("Report \"%s\" not found. If not a cluster level report ensure you include the correct namespace.\n", *name)
+			return nil
 		}
-		document.AppendClusterRbacAssessmentReports(*clusterRbacAssesments)
-
-		clusterReports, err := client.AquasecurityV1alpha1().ClusterVulnerabilityReports("").List(context.TODO(), metav1.ListOptions{})
-		if err != nil {
-			return fmt.Errorf("failed to list cluster vulnerability reports: %w", err)
-		}
-		document.AppendClusterVulnerabilityReports(*clusterReports)
-	}
-
-	configAudits, err := client.AquasecurityV1alpha1().ConfigAuditReports(*namespace).List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to list config audit reports: %w", err)
-	}
-	document.AppendConfigAuditReports(*configAudits)
-
-	exposedSecrets, err := client.AquasecurityV1alpha1().ExposedSecretReports(*namespace).List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to list exposed secret reports: %w", err)
-	}
-	document.AppendExposedSecretReports(*exposedSecrets)
-
-	infraAssessments, err := client.AquasecurityV1alpha1().InfraAssessmentReports(*namespace).List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to list infra assessment reports: %w", err)
-	}
-	document.AppendInfraAssessmentReports(*infraAssessments)
-
-	rbacAssesments, err := client.AquasecurityV1alpha1().RbacAssessmentReports(*namespace).List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to list rbac assessment reports: %w", err)
-	}
-	document.AppendRbacAssessmentReports(*rbacAssesments)
-
-	reports, err := client.AquasecurityV1alpha1().VulnerabilityReports(*namespace).List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to list vulnerability reports: %w", err)
-	}
-	document.AppendVulnerabilityReports(*reports)
-
-	if document.IsEmpty() {
-		fmt.Println("No vulnerability reports found.")
-		return nil
 	}
 
 	funcMap := template.FuncMap{
 		"severity": func(input v1alpha1.Severity) string {
 			return string(input)
 		},
+		"numberOfReports": func(report report.Report) int { return report.NumberOfReports() },
 	}
 
 	tmpl := template.New("base").Funcs(funcMap)
