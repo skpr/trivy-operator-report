@@ -67,17 +67,20 @@ func run() error {
 		if err != nil {
 			return err
 		}
+		if document.IsEmpty() {
+			fmt.Println("No vulnerability reports found.")
+			return nil
+		}
 	} else {
 		opts := metav1.GetOptions{}
 		err = document.PopulateReportByName(client, *name, *namespace, ctx, opts)
 		if err != nil {
 			return err
 		}
-	}
-
-	if document.IsEmpty() {
-		fmt.Println("No vulnerability reports found.")
-		return nil
+		if document.IsEmpty() {
+			fmt.Printf("Report \"%s\" not found. If not a cluster level report ensure you include the correct namespace.\n", *name)
+			return nil
+		}
 	}
 
 	funcMap := template.FuncMap{
