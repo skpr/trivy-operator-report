@@ -84,6 +84,7 @@ func run() error {
 		"severity": func(input v1alpha1.Severity) string {
 			return string(input)
 		},
+		"numberOfReports": func(report report.Report) int { return report.NumberOfReports() },
 	}
 
 	tmpl := template.New("base").Funcs(funcMap)

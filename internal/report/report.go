@@ -33,35 +33,20 @@ func NewReport() Report {
 	}
 }
 
+func (r *Report) NumberOfReports() int {
+	return len(r.ClusterConfigAudits) +
+		len(r.ClusterInfraAssessments) +
+		len(r.ClusterRbacAssessments) +
+		len(r.ClusterVulnerabilities) +
+		len(r.ConfigAudits) +
+		len(r.ExposedSecrets) +
+		len(r.InfraAssessments) +
+		len(r.RbacAssessments) +
+		len(r.Vulnerabilities)
+}
+
 func (r *Report) IsEmpty() bool {
-	if len(r.ClusterConfigAudits) != 0 {
-		return false
-	}
-	if len(r.ClusterInfraAssessments) != 0 {
-		return false
-	}
-	if len(r.ClusterRbacAssessments) != 0 {
-		return false
-	}
-	if len(r.ClusterVulnerabilities) != 0 {
-		return false
-	}
-	if len(r.ConfigAudits) != 0 {
-		return false
-	}
-	if len(r.ExposedSecrets) != 0 {
-		return false
-	}
-	if len(r.InfraAssessments) != 0 {
-		return false
-	}
-	if len(r.RbacAssessments) != 0 {
-		return false
-	}
-	if len(r.Vulnerabilities) != 0 {
-		return false
-	}
-	return true
+	return r.NumberOfReports() == 0
 }
 
 func (r *Report) AddClusterConfigAuditReport(report v1alpha1.ClusterConfigAuditReport) {

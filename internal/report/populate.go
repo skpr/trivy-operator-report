@@ -10,6 +10,7 @@ import (
 )
 
 func (r *Report) PopulateReports(client *clientset.Clientset, namespace string, ctx context.Context, opts metav1.ListOptions) error {
+	// Only include cluster reports if the namespace is 'ALL'.
 	if namespace == "" {
 		clusterConfigAudits, err := client.AquasecurityV1alpha1().ClusterConfigAuditReports(namespace).List(ctx, opts)
 		if err != nil {
@@ -88,26 +89,25 @@ func (r *Report) PopulateReports(client *clientset.Clientset, namespace string, 
 }
 
 func (r *Report) PopulateReportByName(client *clientset.Clientset, name string, namespace string, ctx context.Context, opts metav1.GetOptions) error {
-	if namespace == "" {
-		clusterConfigAudit, _ := client.AquasecurityV1alpha1().ClusterConfigAuditReports(namespace).Get(ctx, name, opts)
-		if clusterConfigAudit != nil {
-			r.AddClusterConfigAuditReport(*clusterConfigAudit)
-		}
+	// Namespace hard-coded to 'ALL' for cluster reports so it can find them by name always. Equivalent to how 'k get clusterrole [name]' ignores any namespace parameters.
+	clusterConfigAudit, _ := client.AquasecurityV1alpha1().ClusterConfigAuditReports("").Get(ctx, name, opts)
+	if clusterConfigAudit != nil {
+		r.AddClusterConfigAuditReport(*clusterConfigAudit)
+	}
 
-		clusterInfraAssessment, _ := client.AquasecurityV1alpha1().ClusterInfraAssessmentReports(namespace).Get(ctx, name, opts)
-		if clusterInfraAssessment != nil {
-			r.AddClusterInfraAssessmentReport(*clusterInfraAssessment)
-		}
+	clusterInfraAssessment, _ := client.AquasecurityV1alpha1().ClusterInfraAssessmentReports("").Get(ctx, name, opts)
+	if clusterInfraAssessment != nil {
+		r.AddClusterInfraAssessmentReport(*clusterInfraAssessment)
+	}
 
-		clusterRbacAssesment, _ := client.AquasecurityV1alpha1().ClusterRbacAssessmentReports(namespace).Get(ctx, name, opts)
-		if clusterRbacAssesment != nil {
-			r.AddClusterRbacAssessmentReport(*clusterRbacAssesment)
-		}
+	clusterRbacAssessment, _ := client.AquasecurityV1alpha1().ClusterRbacAssessmentReports("").Get(ctx, name, opts)
+	if clusterRbacAssessment != nil {
+		r.AddClusterRbacAssessmentReport(*clusterRbacAssessment)
+	}
 
-		clusterVulnerabilityReport, _ := client.AquasecurityV1alpha1().ClusterVulnerabilityReports(namespace).Get(ctx, name, opts)
-		if clusterVulnerabilityReport != nil {
-			r.AddClusterVulnerabilityReport(*clusterVulnerabilityReport)
-		}
+	clusterVulnerabilityReport, _ := client.AquasecurityV1alpha1().ClusterVulnerabilityReports("").Get(ctx, name, opts)
+	if clusterVulnerabilityReport != nil {
+		r.AddClusterVulnerabilityReport(*clusterVulnerabilityReport)
 	}
 
 	configAudit, _ := client.AquasecurityV1alpha1().ConfigAuditReports(namespace).Get(ctx, name, opts)
