@@ -122,7 +122,7 @@ func run() error {
 
 		filename := fmt.Sprintf("%s_trivy_report_%s.html", cluster, time.Now().Format(time.RFC3339))
 
-		uploadParams := slack.UploadFileV2Parameters{
+		uploadParams := slack.UploadFileParameters{
 			Channel:        channelID,
 			Title:          filename,
 			InitialComment: fmt.Sprintf("New infrastructure security report for %s", cluster),
@@ -132,7 +132,7 @@ func run() error {
 		}
 
 		client := slack.New(slackBotToken)
-		_, err = client.UploadFileV2Context(ctx, uploadParams)
+		_, err = client.UploadFileContext(ctx, uploadParams)
 		if err != nil {
 			return fmt.Errorf("error uploading file: %v", err)
 		}
