@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      {{ template "base.css" . }}
+    </style>
+    <title>Report</title>
+  </head>
+  <body>
+    <div class="page">
+      {{ template "tableofcontents.gohtml" . }}
+      {{ if gt (len .ClusterConfigAudits) 0 }}
+        <h1 id="clusterconfigaudit">Cluster Config Audit</h1>
+        <h2 id="clusterconfigauditIndex">Index</h2>
+        <ul>
+          {{- range .ClusterConfigAudits }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+        <h2 id="clusterconfigauditDetail">Detail</h2>
+        {{- range .ClusterConfigAudits }}
+        {{ template "configaudit.gohtml" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .ClusterInfraAssessments) 0 }}
+        <h1 id="clusterinfraassessment">Cluster Infra Assessments</h1>
+        <h2 id="clusterinfraassessmentIndex">Index</h2>
+        <ul>
+          {{- range .ClusterInfraAssessments }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+        <h2 id="clusterinfraassessmentDetail">Detail</h2>
+        {{- range .ClusterInfraAssessments }}
+        {{ template "infraassessment.gohtml" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .ClusterRbacAssessments) 0 }}
+        <h1 id="clusterrbacassessment">Cluster Rbac Assessments</h1>
+        <h2 id="clusterrbacassessmentIndex">Index</h2>
+        <ul>
+          {{- range .ClusterRbacAssessments }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+        <h2 id="clusterrbacassessmentDetail">Detail</h2>
+        {{- range .ClusterRbacAssessments }}
+        {{ template "rbacassessment.gohtml" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .ClusterVulnerabilities) 0 }}
+        <h1 id="clustervuln">Cluster Vulnerabilities</h1>
+        <h2 id="clustervulnIndex">Index</h2>
+        <ul>
+          {{- range .ClusterVulnerabilities }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+        <h2 id="clustervulnDetail">Detail</h2>
+        {{- range .ClusterVulnerabilities }}
+        {{ template "vulnerability.gohtml" . }}
+        {{ end }}
+      {{ end }}
+      {{ if gt (len .ConfigAudits) 0 }}
+        <h1 id="configaudit">Config Audit</h1>
+        <h2 id="configauditIndex">Index</h2>
+        <ul>
+          {{- range .ConfigAudits }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+        <h2 id="configauditDetail">Detail</h2>
+        {{- range .ConfigAudits }}
+        {{ template "configaudit.gohtml" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .ExposedSecrets) 0 }}
+        <h1 id="exposesecret">Exposed Secret</h1>
+        <h2 id="exposesecretIndex">Index</h2>
+        <ul>
+          {{- range .ExposedSecrets }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+        <h2 id="exposesecretDetail">Detail</h2>
+        {{- range .ExposedSecrets }}
+        {{ template "exposedsecret.gohtml" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .InfraAssessments) 0 }}
+        <h1 id="infraassessment">Infra Assessments</h1>
+        <h2 id="infraassessmentIndex">Index</h2>
+        <ul>
+          {{- range .InfraAssessments }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+        <h2 id="infraassessmentDetail">Detail</h2>
+        {{- range .InfraAssessments }}
+        {{ template "infraassessment.gohtml" . }}
+        {{ end }}
+      {{ end }}
+      {{ if gt (len .RbacAssessments) 0 }}
+        <h1 id="rbacassessment">Rbac Assessments</h1>
+        <h2 id="rbacassessmentIndex">Index</h2>
+        <ul>
+          {{- range .RbacAssessments }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+        <h2 id="rbacassessmentDetail">Detail</h2>
+        {{- range .RbacAssessments }}
+        {{ template "rbacassessment.gohtml" . }}
+        {{- end }}
+      {{ end }}
+      {{ if gt (len .Vulnerabilities) 0 }}
+        <h1 id="vuln">Vulnerabilities</h1>
+        <h2 id="vulnContainerSummary">Container Summary</h2>
+        {{ template "vulnerabilitysummaries.gohtml" .VulnerabilitySummaries }}
+        <h2 id="vulnIndex">Index</h2>
+        <ul>
+        {{- range .Vulnerabilities }}
+          <li><a href="#{{ .Name }}">{{ .Name }}</a></li>
+        {{- end }}
+        </ul>
+        <h2 id="vulnDetail">Detail</h2>
+        {{- range .Vulnerabilities }}
+        {{ template "vulnerability.gohtml" . }}
+        {{- end }}
+      {{ end }}
+    </div>
+  </body>
+</html>

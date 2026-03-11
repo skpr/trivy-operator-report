@@ -35,6 +35,9 @@ table {
 .summary td {
     width: 20%;
 }
+.containerSummary td.severity {
+    width: 5%;
+}
 
 @media print {
     body {

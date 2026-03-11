@@ -92,7 +92,7 @@ func run() error {
 
 	tmpl := template.New("base").Funcs(funcMap)
 
-	globs := []string{"*.css", "*.html"}
+	globs := []string{"*.css", "*.gohtml"}
 	for _, glob := range globs {
 		tmpl, err = tmpl.ParseFS(templateFS, "templates/"+glob)
 		if err != nil {
@@ -101,7 +101,7 @@ func run() error {
 	}
 
 	var buf bytes.Buffer
-	err = tmpl.ExecuteTemplate(&buf, "report.html", document)
+	err = tmpl.ExecuteTemplate(&buf, "report.gohtml", document)
 	if err != nil {
 		return fmt.Errorf("failed to execute template: %w", err)
 	}
