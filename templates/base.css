@@ -25,7 +25,6 @@ table {
 .severity {
     font-weight: bold;
     text-align: center;
-    color: #fafafa;
 }
 .cve {
     font-weight: bold;
@@ -34,6 +33,9 @@ table {
 }
 .summary td {
     width: 20%;
+}
+.containerSummary td.severity {
+    width: 5%;
 }
 
 @media print {
@@ -50,7 +52,11 @@ table {
     }
 }
 
-td {
+td, th {
+    &.severity {
+        color: #fafafa;
+    }
+
     &.severity-LOW {
         background-color: #5fbb31;
     }
@@ -72,7 +78,11 @@ td {
     }
 }
 
-tr {
+td.severity-data, th.severity-data {
+    &.severity {
+        color: #000000;
+    }
+
     &.severity-LOW {
         background-color: #5fbb3160;
     }

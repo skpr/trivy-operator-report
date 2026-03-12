@@ -1,11 +1,17 @@
 package report
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/aquasecurity/trivy-operator/pkg/apis/aquasecurity/v1alpha1"
 	"github.com/skpr/trivy-operator-report/internal/sorter"
 )
+
+type ReportVulnerabilitySummary struct {
+	Id      string
+	Summary *v1alpha1.VulnerabilitySummary
+}
 
 type Report struct {
 	ClusterConfigAudits     []*v1alpha1.ClusterConfigAuditReport
@@ -16,6 +22,7 @@ type Report struct {
 	ExposedSecrets          []*v1alpha1.ExposedSecretReport
 	InfraAssessments        []*v1alpha1.InfraAssessmentReport
 	RbacAssessments         []*v1alpha1.RbacAssessmentReport
+	VulnerabilitySummaries  map[string]*ReportVulnerabilitySummary
 	Vulnerabilities         []*v1alpha1.VulnerabilityReport
 }
 
@@ -29,6 +36,7 @@ func NewReport() Report {
 		ExposedSecrets:          []*v1alpha1.ExposedSecretReport{},
 		InfraAssessments:        []*v1alpha1.InfraAssessmentReport{},
 		RbacAssessments:         []*v1alpha1.RbacAssessmentReport{},
+		VulnerabilitySummaries:  map[string]*ReportVulnerabilitySummary{},
 		Vulnerabilities:         []*v1alpha1.VulnerabilityReport{},
 	}
 }
@@ -116,6 +124,14 @@ func (r *Report) AddRbacAssessmentReport(report v1alpha1.RbacAssessmentReport) {
 func (r *Report) AddVulnerabilityReport(report v1alpha1.VulnerabilityReport) {
 	if len(report.Report.Vulnerabilities) == 0 {
 		return
+	}
+	name := fmt.Sprintf("%s:%s", report.Report.Artifact.Repository, report.Report.Artifact.Tag)
+	if _, ok := r.VulnerabilitySummaries[name]; !ok {
+		summary := ReportVulnerabilitySummary{
+			Id:      name,
+			Summary: &report.Report.Summary,
+		}
+		r.VulnerabilitySummaries[name] = &summary
 	}
 	sort.Sort(sorter.VulnerabilitySorter(report.Report.Vulnerabilities))
 	r.Vulnerabilities = append(r.Vulnerabilities, &report)
