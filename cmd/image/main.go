@@ -2,16 +2,30 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/aquasecurity/table"
-	"github.com/aquasecurity/trivy-operator/pkg/apis/aquasecurity/v1alpha1"
 	"github.com/aquasecurity/trivy-operator/pkg/clientset"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
 )
+
+type cveEntry struct {
+	title  string
+	images []string
+}
+
+type jsonEntry struct {
+	ID     string   `json:"id"`
+	Title  string   `json:"title"`
+	Images []string `json:"images"`
+}
 
 func main() {
 	if err := run(); err != nil {
@@ -20,6 +34,10 @@ func main() {
 }
 
 func run() error {
+	var asJSON bool
+	flag.BoolVar(&asJSON, "json", false, "Output as JSON")
+	flag.Parse()
+
 	config, err := clientcmd.BuildConfigFromFlags("", os.Getenv("KUBECONFIG"))
 	if err != nil {
 		return fmt.Errorf("failed to build config: %w", err)
@@ -35,22 +53,71 @@ func run() error {
 		return fmt.Errorf("failed to list vulnerability reports: %w", err)
 	}
 
-	summaries := make(map[string]v1alpha1.VulnerabilitySummary)
+	cves := make(map[string]*cveEntry)
 
 	for _, item := range reports.Items {
-		name := fmt.Sprintf("%s:%s", item.Report.Artifact.Repository, item.Report.Artifact.Tag)
+		namespace := item.Namespace
+		image := fmt.Sprintf("%s:%s", item.Report.Artifact.Repository, item.Report.Artifact.Tag)
+		ref := fmt.Sprintf("%s/%s", namespace, image)
 
-		if _, ok := summaries[name]; !ok {
-			summaries[name] = item.Report.Summary
+		for _, vuln := range item.Report.Vulnerabilities {
+			if string(vuln.Severity) != "CRITICAL" {
+				continue
+			}
+
+			id := vuln.VulnerabilityID
+			entry, ok := cves[id]
+			if !ok {
+				title := vuln.Title
+				if title == "" {
+					title = vuln.Description
+				}
+				entry = &cveEntry{
+					title: title,
+				}
+				cves[id] = entry
+			}
+
+			found := false
+			for _, existing := range entry.images {
+				if existing == ref {
+					found = true
+					break
+				}
+			}
+			if !found {
+				entry.images = append(entry.images, ref)
+			}
 		}
 	}
 
+	ids := make([]string, 0, len(cves))
+	for id := range cves {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+
+	if asJSON {
+		entries := make([]jsonEntry, 0, len(ids))
+		for _, id := range ids {
+			entry := cves[id]
+			sort.Strings(entry.images)
+			entries = append(entries, jsonEntry{
+				ID:     id,
+				Title:  entry.title,
+				Images: entry.images,
+			})
+		}
+		return json.NewEncoder(os.Stdout).Encode(entries)
+	}
+
 	t := table.New(os.Stdout)
+	t.SetHeaders("CVE ID", "Title", "Namespace/Image")
 
-	t.SetHeaders("Image", "Critical", "High", "Medium", "Low", "Unknown", "None")
-
-	for name, summary := range summaries {
-		t.AddRow(name, fmt.Sprintf("%d", summary.CriticalCount), fmt.Sprintf("%d", summary.HighCount), fmt.Sprintf("%d", summary.MediumCount), fmt.Sprintf("%d", summary.LowCount), fmt.Sprintf("%d", summary.UnknownCount), fmt.Sprintf("%d", summary.NoneCount))
+	for _, id := range ids {
+		entry := cves[id]
+		sort.Strings(entry.images)
+		t.AddRow(id, entry.title, strings.Join(entry.images, "\n"))
 	}
 
 	t.Render()
