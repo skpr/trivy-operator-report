@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/aquasecurity/trivy-operator v0.30.0
-	github.com/slack-go/slack v0.23.1
+	github.com/slack-go/slack v0.24.0
 	github.com/spf13/pflag v1.0.10
 	k8s.io/apimachinery v0.36.1
 	k8s.io/client-go v0.36.1
